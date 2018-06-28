@@ -13,7 +13,8 @@ class Employees(Resource):
     def get(self):
         conn = db_connect.connect() # connect to database
         query = conn.execute("select * from employees") # This line performs query and returns json result
-        return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID
+        print(query,'hello')
+        return {'employees': ['hello', query]} # Fetches first column that is Employee ID
     
     def post(self):
         conn = db_connect.connect()
@@ -63,4 +64,4 @@ api.add_resource(Employees_Name, '/employees/<employee_id>') # Route_3
 
 
 if __name__ == '__main__':
-     app.run()
+     app.run(debug=True)
