@@ -1,42 +1,28 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
-from sqlalchemy import create_engine
+from flask_restful import Api, Resource
 from json import dumps
 from flask import jsonify
+import pandas as pd
+import json
 
-db_connect = create_engine('sqlite:///chinook.db')
 app = Flask(__name__)
 api = Api(app)
 
+class User_ID(Resource):
 
-class Employees(Resource):
     def get(self):
-        conn = db_connect.connect()  # connect to database
-        query = conn.execute("select * from employees")  # This line performs query and returns json result
-        # print(query.cursor.fetchall(), 'hello')
-        return {'employees': [i[1:3] for i in query.cursor.fetchall()], 'stuff':request.args}  # Fetches first column that is Employee ID
+        User_Ser_count = pd.read_csv('/Users/athul/Desktop/linkedin.mindtickle.com_Series_count_sorted.csv')
+        out = {'distinctid': str(request.args['distinctid'])}  # Fetches first column that is Employee ID
+        distinct_id = out ['distinctid']
+        out['Series'] = User_Ser_count.loc[User_Ser_count['distinctid'] == distinct_id]['SeriesId'].values.tolist()
+        print(type(out['Series']))
+#         print(type(out))
+        return jsonify(out)
 
 
-class Tracks(Resource):
-    def get(self):
-        conn = db_connect.connect()
-        query = conn.execute("select trackid, name, composer, unitprice from tracks;")
-        result = {'data': [dict(zip(tuple(query.keys()), i)) for i in query.cursor]}
-        return jsonify(result)
+api.add_resource(User_ID, '/userid')  # Route_1
 
-
-class Employees_Name(Resource):
-    def get(self, employee_id):
-        conn = db_connect.connect()
-        query = conn.execute("select * from employees where EmployeeId =%d " % int(employee_id))
-        result = {'data': [dict(zip(tuple(query.keys()), i)) for i in query.cursor]}
-        return jsonify(result)
-
-
-# api.add_resource()
-api.add_resource(Employees, '/employees')  # Route_1
-api.add_resource(Tracks, '/tracks')  # Route_2
-api.add_resource(Employees_Name, '/employees/<employee_id>')  # Route_3
 
 if __name__ == '__main__':
+
     app.run(port='5002',debug=True)
