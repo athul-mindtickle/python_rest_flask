@@ -16,7 +16,6 @@ class User_ID(Resource):
         distinct_id = out ['distinctid']
         out['Series'] = User_Ser_count.loc[User_Ser_count['distinctid'] == distinct_id]['SeriesId'].values.tolist()
         print(type(out['Series']))
-#         print(type(out))
         return jsonify(out)
 
 
